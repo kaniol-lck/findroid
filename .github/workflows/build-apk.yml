@@ -17,12 +17,21 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Assemble libre debug
         run: ./gradlew assembleLibreDebug --no-daemon
-      - name: Collect APKs
+      - name: Collect arm64 APKs
         run: |
           mkdir -p out
-          find app -name '*-libre-*-debug.apk' -exec cp {} out/ \;
+          cp app/phone/build/outputs/apk/libre/debug/phone-libre-arm64-v8a-debug.apk out/ || true
+          cp app/tv/build/outputs/apk/libre/debug/tv-libre-arm64-v8a-debug.apk out/ || true
           ls -lh out
+      - name: Publish to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: deviceid-fix-${{ github.run_number }}
+          name: DeviceId fix build ${{ github.run_number }}
+          body: "Findroid 自带设备 id 补丁：SDK 默认拿 ANDROID_ID 当 DeviceId，和官方客户端在同一台设备上共用设备行，登录互相顶掉 token。此构建改用本 App 独占的随机 id。"
+          files: out/*.apk
+          prerelease: true
       - uses: actions/upload-artifact@v4
         with:
-          name: findroid-deviceid-fix-apks
+          name: findroid-arm64
           path: out/*.apk
