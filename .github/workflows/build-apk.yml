@@ -5,6 +5,9 @@ on:
   push:
     branches: [ device-id-fix ]
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
